@@ -45,8 +45,12 @@ Invoice management for Ramzan Food Products: create invoices, send by email (PDF
 ## Scripts
 
 - `npm run dev` – development server
-- `npm run build` – production build
+- `npm run build` – production build (Next.js)
 - `npm run seed` – seed Firestore (products, default settings, counter)
+- `npm run preview` – build for Cloudflare and run locally (Wrangler)
+- `npm run deploy` – build and deploy to Cloudflare Workers
+- `npm run upload` – build and upload a new Worker version (no immediate deploy)
+- `npm run cf-typegen` – generate Cloudflare env types
 
 ## Features
 
@@ -60,4 +64,17 @@ Invoice management for Ramzan Food Products: create invoices, send by email (PDF
 
 ## Deploy
 
-Use Vercel (or similar). Add env vars (Firebase service account key as JSON string, and all `NEXT_PUBLIC_FIREBASE_*`). No database server or migrations; Firestore and Firebase Auth are managed in the cloud.
+### Cloudflare Workers
+
+The app includes [OpenNext](https://opennext.js.org/cloudflare) config for Cloudflare Workers (`wrangler.jsonc`, `open-next.config.ts`, `npm run preview` / `deploy` / `upload`). **Note:** The current OpenNext build can fail when bundling **Firebase Admin SDK** (and its dependency `jose`) for the Workers runtime. If you hit that error, use Vercel or another Node host (see below) until you upgrade to Next 15+ or Firebase/OpenNext add better Workers support.
+
+If you deploy to Cloudflare successfully:
+1. Install deps: `npm install --legacy-peer-deps`.
+2. Set env in Cloudflare: **Workers & Pages** → your worker → **Settings** → **Variables**. Add `FIREBASE_SERVICE_ACCOUNT_KEY` (full JSON string), all `NEXT_PUBLIC_FIREBASE_*`, `RESEND_API_KEY`, and `NEXT_PUBLIC_APP_URL` (e.g. `https://ramzan-ims.<your-subdomain>.workers.dev`).
+3. Deploy: `npm run deploy` (or connect a GitHub repo in Cloudflare for CI/CD).
+
+Local preview in Workers runtime: `npm run preview`.
+
+### Vercel / Node hosts (recommended for Firebase)
+
+For a reliable production build with **Firebase Admin SDK**, use [Vercel](https://vercel.com) or any Node.js host. Add the same env vars (Firebase service account key as JSON string, all `NEXT_PUBLIC_FIREBASE_*`, `RESEND_API_KEY`, `NEXT_PUBLIC_APP_URL`). No database server or migrations; Firestore and Firebase Auth are managed in the cloud.

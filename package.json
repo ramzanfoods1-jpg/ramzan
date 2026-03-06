@@ -8,9 +8,14 @@
     "start": "next start",
     "lint": "next lint",
     "seed": "npx tsx scripts/seed-firestore.ts",
-    "pwa:build": "node scripts/build-pwa-icons.js"
+    "pwa:build": "node scripts/build-pwa-icons.js",
+    "preview": "opennextjs-cloudflare build --dangerouslyUseUnsupportedNextVersion && opennextjs-cloudflare preview",
+    "deploy": "opennextjs-cloudflare build --dangerouslyUseUnsupportedNextVersion && opennextjs-cloudflare deploy",
+    "upload": "opennextjs-cloudflare build --dangerouslyUseUnsupportedNextVersion && opennextjs-cloudflare upload",
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
   },
   "dependencies": {
+    "@opennextjs/cloudflare": "^1.17.1",
     "firebase": "^12.10.0",
     "firebase-admin": "^13.7.0",
     "next": "14.2.33",
@@ -31,6 +36,7 @@
     "sharp": "^0.33.5",
     "tailwindcss": "^3.4.1",
     "tsx": "^4.21.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "^4.71.0"
   }
 }
