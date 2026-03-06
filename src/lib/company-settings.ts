@@ -1,4 +1,4 @@
-import { adminDb } from "./firebase";
+import { getAdminDb } from "./firebase";
 
 export type CompanyForPdf = {
   companyName: string;
@@ -87,7 +87,7 @@ function buildCompany(data: Record<string, unknown> | null): CompanyForPdf {
  * If the doc is missing or has no content, returns PDF_DEFAULTS so the invoice always renders.
  */
 export async function getCompanyForPdf(): Promise<CompanyForPdf> {
-  const ref = adminDb.collection("companySettings").doc("default");
+  const ref = getAdminDb().collection("companySettings").doc("default");
   const snap = await ref.get();
   const data = snap.exists ? (snap.data() as Record<string, unknown>) : null;
   return buildCompany(data);

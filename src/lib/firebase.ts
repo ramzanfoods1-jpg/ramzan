@@ -26,19 +26,47 @@ function getFirebaseCredential(): ReturnType<typeof cert> | undefined {
   return undefined;
 }
 
-if (!getApps().length) {
-  const credential = getFirebaseCredential();
-  initializeApp({
-    ...(credential && { credential }),
-    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || process.env.GCLOUD_PROJECT,
-  });
+function ensureFirebase() {
+  if (!getApps().length) {
+    const credential = getFirebaseCredential();
+    if (!credential) {
+      throw new Error(
+        "Firebase not configured. Set FIREBASE_SERVICE_ACCOUNT_KEY (JSON string) or FIREBASE_SERVICE_ACCOUNT_PATH in the deployment environment."
+      );
+    }
+    initializeApp({
+      credential,
+      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || process.env.GCLOUD_PROJECT,
+    });
+  }
 }
 
-export const adminAuth = getAuth();
-export const adminDb = getFirestore();
+export function getAdminAuth() {
+  ensureFirebase();
+  return getAuth();
+}
+
+export function getAdminDb() {
+  ensureFirebase();
+  return getFirestore();
+}
+
+/** @deprecated Use getAdminAuth() so init is lazy and build works without credentials */
+export const adminAuth = new Proxy({} as ReturnType<typeof getAuth>, {
+  get(_, prop) {
+    return (getAdminAuth() as unknown as Record<string, unknown>)[prop as string];
+  },
+});
+
+/** @deprecated Use getAdminDb() so init is lazy and build works without credentials */
+export const adminDb = new Proxy({} as ReturnType<typeof getFirestore>, {
+  get(_, prop) {
+    return (getAdminDb() as unknown as Record<string, unknown>)[prop as string];
+  },
+});
 
 export function getFirestoreCollections() {
-  const db = getFirestore();
+  const db = getAdminDb();
   return {
     users: db.collection("users"),
     companySettings: db.collection("companySettings"),

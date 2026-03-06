@@ -20,7 +20,8 @@ Invoice management for Ramzan Food Products: create invoices, send by email (PDF
    - Create a [Firebase project](https://console.firebase.google.com)
    - Enable **Firestore** and **Authentication** (Email/Password)
    - In Project settings > Service accounts, generate a new private key and copy the JSON
-   - Set env: `FIREBASE_SERVICE_ACCOUNT_KEY` to the full JSON string (single line)
+   - **Local:** Set `FIREBASE_SERVICE_ACCOUNT_KEY` (full JSON string) or `FIREBASE_SERVICE_ACCOUNT_PATH` (path to the JSON file)
+   - **Deploy (Vercel etc.):** Set `FIREBASE_SERVICE_ACCOUNT_KEY` to the full JSON string (single line). Do not rely on `FIREBASE_SERVICE_ACCOUNT_PATH` in production—the build does not need credentials; the runtime does.
    - Set `NEXT_PUBLIC_FIREBASE_PROJECT_ID`, `NEXT_PUBLIC_FIREBASE_API_KEY`, `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` from Project settings > General
    - Deploy Firestore rules: `firebase deploy --only firestore:rules` (optional; app uses Admin SDK so client can be locked down)
 

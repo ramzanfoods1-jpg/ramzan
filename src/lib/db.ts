@@ -1,7 +1,16 @@
 import { FieldValue } from "firebase-admin/firestore";
-import { adminDb, getFirestoreCollections } from "./firebase";
+import { getAdminDb, getFirestoreCollections } from "./firebase";
 
-export const collections = getFirestoreCollections();
+function getCollections() {
+  return getFirestoreCollections();
+}
+
+/** Lazy collections: only connects to Firestore when first used (allows build without credentials). */
+export const collections = new Proxy({} as ReturnType<typeof getFirestoreCollections>, {
+  get(_, prop) {
+    return (getCollections() as Record<string, unknown>)[prop as string];
+  },
+});
 
 export type InvoiceStatus =
   | "draft"
@@ -54,8 +63,9 @@ export interface PaymentDoc {
 }
 
 export async function getNextInvoiceNumber(): Promise<number> {
-  const ref = adminDb.collection("counters").doc("invoiceNumber");
-  const result = await adminDb.runTransaction(async (tx) => {
+  const db = getAdminDb();
+  const ref = db.collection("counters").doc("invoiceNumber");
+  const result = await db.runTransaction(async (tx) => {
     const snap = await tx.get(ref);
     const next = (snap.exists ? (snap.data()?.value ?? 0) : 0) + 1;
     tx.set(ref, { value: next, updatedAt: new Date().toISOString() });
