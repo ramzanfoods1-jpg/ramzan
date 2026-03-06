@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Ramzan Invoice Management System
 
-## Getting Started
+Invoice management for Ramzan Food Products: create invoices, send by email (PDF + shareable link), track due/paid/overdue, and record payments. Multi-staff logins with salesperson codes.
 
-First, run the development server:
+## Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Next.js 14** (App Router)
+- **Firebase** (Firestore + Auth)
+- **Resend** (email)
+- **pdf-lib** (PDF generation)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **Clone and install**
+   ```bash
+   npm install
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. **Firebase**
+   - Create a [Firebase project](https://console.firebase.google.com)
+   - Enable **Firestore** and **Authentication** (Email/Password)
+   - In Project settings > Service accounts, generate a new private key and copy the JSON
+   - Set env: `FIREBASE_SERVICE_ACCOUNT_KEY` to the full JSON string (single line)
+   - Set `NEXT_PUBLIC_FIREBASE_PROJECT_ID`, `NEXT_PUBLIC_FIREBASE_API_KEY`, `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` from Project settings > General
+   - Deploy Firestore rules: `firebase deploy --only firestore:rules` (optional; app uses Admin SDK so client can be locked down)
 
-## Learn More
+3. **Environment**
+   - Copy `.env.example` to `.env`
+   - Set Firebase vars as above
+   - Set `RESEND_API_KEY` for sending invoices by email
+   - Set `NEXT_PUBLIC_APP_URL` for shareable links (e.g. `http://localhost:3000`)
 
-To learn more about Next.js, take a look at the following resources:
+4. **Seed**
+   ```bash
+   npm run seed
+   ```
+   Seeds products and default company settings (and invoice counter) if empty.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+5. **Run**
+   ```bash
+   npm run dev
+   ```
+   Open http://localhost:3000. Register a user, then sign in.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Scripts
 
-## Deploy on Vercel
+- `npm run dev` – development server
+- `npm run build` – production build
+- `npm run seed` – seed Firestore (products, default settings, counter)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Features
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Auth**: Register / sign in (Firebase Auth email + password). Salesperson code per user (stored in Firestore `users`).
+- **Settings**: Company name, tagline, address, phone, email, bank details, tax rate.
+- **Products**: CRUD; seed loads sample frozen food products.
+- **Customers**: CRUD with name, email, phone, address, default payment terms.
+- **Invoices**: Create (customer, salesperson, line items), edit draft, download PDF, send by email (PDF + shareable link). Filters: All / Draft / Sent / Due / Overdue / Paid.
+- **Payments**: Record payment (amount, method: account / cash / cheque); status updates to paid / partially paid.
+- **Shareable link**: Customers open `/invoice/view?token=...` to view and download PDF (no login).
+
+## Deploy
+
+Use Vercel (or similar). Add env vars (Firebase service account key as JSON string, and all `NEXT_PUBLIC_FIREBASE_*`). No database server or migrations; Firestore and Firebase Auth are managed in the cloud.

@@ -1,0 +1,9 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // All access from client is denied; use Firebase Admin SDK from Next.js API only
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
