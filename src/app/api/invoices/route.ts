@@ -197,7 +197,7 @@ export async function POST(req: Request) {
     });
   } catch (e) {
     if (e instanceof z.ZodError) {
-      const msg = e.errors.map((err) => err.message).join("; ") || "Invalid request";
+      const msg = e.issues.map((issue) => issue.message).join("; ") || "Invalid request";
       return NextResponse.json({ error: { message: msg }, details: e.flatten() }, { status: 400 });
     }
     return NextResponse.json({ error: { message: "Create failed" } }, { status: 500 });
