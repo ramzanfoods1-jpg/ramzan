@@ -4,13 +4,13 @@ import { getAuth } from "firebase-admin/auth";
 import { readFileSync } from "fs";
 import path from "path";
 
-function getFirebaseCredential() {
+function getFirebaseCredential(): ReturnType<typeof cert> | undefined {
   const key = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
   if (key) {
     try {
       return cert(JSON.parse(key) as ServiceAccount);
     } catch {
-      throw new Error("Invalid FIREBASE_SERVICE_ACCOUNT_KEY JSON");
+      return undefined;
     }
   }
   const keyPath = process.env.FIREBASE_SERVICE_ACCOUNT_PATH;
@@ -20,7 +20,7 @@ function getFirebaseCredential() {
       const json = readFileSync(resolved, "utf8");
       return cert(JSON.parse(json) as ServiceAccount);
     } catch {
-      throw new Error(`Failed to load Firebase service account from path: ${keyPath}`);
+      return undefined;
     }
   }
   return undefined;
