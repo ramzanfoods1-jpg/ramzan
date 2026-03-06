@@ -45,7 +45,7 @@ export async function GET(
   const storedName = (invData as { salespersonName?: string }).salespersonName?.trim();
   const salespersonData = salespersonSnap.exists ? salespersonSnap.data()! : null;
   let salespersonName = storedName || (salespersonData?.name ?? null);
-  let salespersonCode = salespersonData?.salespersonCode ?? null;
+  const salespersonCode = salespersonData?.salespersonCode ?? null;
   let salespersonEmail = salespersonData?.email ?? null;
   if (!salespersonName && (!salespersonCode && !salespersonEmail || !salespersonSnap.exists)) {
     try {
@@ -184,7 +184,7 @@ export async function PATCH(
     const storedSpName = (updatedData as { salespersonName?: string }).salespersonName?.trim();
     const spData = salespersonSnap.exists ? salespersonSnap.data()! : null;
     let spName = storedSpName || (spData?.name ?? null);
-    let spCode = spData?.salespersonCode ?? null;
+    const spCode = spData?.salespersonCode ?? null;
     let spEmail = spData?.email ?? null;
     if (!spName && (!spCode && !spEmail || !salespersonSnap.exists)) {
       try {

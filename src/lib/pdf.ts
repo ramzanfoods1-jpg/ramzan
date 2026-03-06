@@ -161,7 +161,6 @@ export async function buildInvoicePdf(
   // ----- Table: blue header row (Qty, Description, Unit Price, Line Total) -----
   const colQty = margin;
   const colDesc = margin + 38;
-  const colUnit = 380;
   const colTotal = 480;
   const tableWidth = rightMargin - margin;
   const rowHeight = 16;
